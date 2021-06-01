@@ -105,7 +105,12 @@ export default function UserProfile() {
 
     axios
       .post('/user/profile', formData, {})
-      .then((res) => console.log(res))
+      .then((res) => {
+        setAuth({
+          authenticated: true,
+          user: res.data.data,
+        })
+      })
       .catch((err) => console.log(err))
   }
 
