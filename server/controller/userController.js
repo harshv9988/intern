@@ -92,21 +92,24 @@ module.exports.signupEmail = async (req, res) => {
     const user2 = await User.findOne({ username: req.body.username });
     if (user2) {
       return res.status(400).json({
-        error: "user already exist with this username",
+        message: "user already exist with this username",
+        type: "userName",
         success: false,
       });
     }
     if (user1) {
       return res.status(400).json({
         error: "user already exist with this email",
+        type: "email",
         success: false,
       });
     }
 
     const newUser = await User.create(req.body);
-    const resetToken = newUser._id;
-    const resetUrl = `http://localhost:3000/password/reset/${resetToken}`;
-    const message = `Your password verification token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`;
+    const verificationToken = newUser._id;
+    const verificationUrl = `http://localhost:3000/verification/${verificationToken}`;
+    const message = `Your email verification token is as follow:\n\n${verificationUrl}\n\nIf you have not requested this email, then ignore it.`;
+
     await sendEmail({
       email: newUser.email,
       subject: "verification",
@@ -154,7 +157,8 @@ module.exports.login = async (req, res) => {
 
     if (!user.verified) {
       return res.status(400).json({
-        error: "Email not verified",
+        message: "Email not verified",
+        verified: false,
         success: false,
       });
     }
