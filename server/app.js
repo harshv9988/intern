@@ -13,9 +13,8 @@ app.use(bodyparser.urlencoded({ extended: true }));
 // app.use(fileupload());
 app.use(cookieParser());
 
-app.use("/uploads", express.static(__dirname + "uploads"));
-console.log(path.join(__dirname + "/uploads"));
-// app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static(__dirname + "../uploads")); dont use this as express.static reaches to root automatically ading anything further will kill the path
+app.use("/uploads", express.static("uploads"));
 
 //cors
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));

@@ -2,7 +2,8 @@ const User = require("../models/User");
 const sendTokenUser = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const { OAuth2Client } = require("google-auth-library");
-const CLIENT_ID = "";
+const CLIENT_ID =
+  "609110533672-iepitekbbjm6rc13l6nkhetjerm4v4g7.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 const { v4: uuidv4 } = require("uuid");
 
@@ -155,17 +156,17 @@ module.exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
-    if (!user.verified) {
+    if (!user) {
       return res.status(400).json({
-        message: "Email not verified",
-        verified: false,
+        error: "user already exist with this email",
         success: false,
       });
     }
 
-    if (!user) {
+    if (!user.verified) {
       return res.status(400).json({
-        error: "user already exist with this email",
+        message: "Email not verified",
+        verified: false,
         success: false,
       });
     }
@@ -189,6 +190,21 @@ module.exports.login = async (req, res) => {
 module.exports.getDetails = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
+    return res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports.update = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, req.body);
     return res.status(200).json({
       success: true,
       data: user,
