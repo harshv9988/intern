@@ -9,7 +9,9 @@ import { authContext } from './context/Auth'
 import axios from 'axios'
 import Header from './components/Header/Header'
 import UserProfile from './components/Profile/UserProfile'
+import ProfileUser from './components/Profile/Profile'
 import EmailVerification from './components/Verification/EmailVerification'
+import Loader from './components/Loader/Loader'
 
 function App() {
   let { auth, setAuth } = useContext(authContext)
@@ -40,16 +42,27 @@ function App() {
   }, [])
 
   return (
-    <Router>
-      <Switch>
-        <div>
-          <Header />
-          {/* <Route exact path='/' component={LandingPage} /> */}
-          <Route exact path='/profile' component={UserProfile} />
-          <Route exact path='/verification/:id' component={EmailVerification} />
-        </div>
-      </Switch>
-    </Router>
+    <>
+      {auth.authenticated ? (
+        <Router>
+          <Switch>
+            <div>
+              <Header />
+              {/* <Route exact path='/' component={LandingPage} /> */}
+              <Route exact path='/profile' component={UserProfile} />
+              {/* <Route exact path='/profile' component={ProfileUser} /> */}
+              <Route
+                exact
+                path='/verification/:id'
+                component={EmailVerification}
+              />
+            </div>
+          </Switch>
+        </Router>
+      ) : (
+        <Loader />
+      )}
+    </>
   )
 }
 

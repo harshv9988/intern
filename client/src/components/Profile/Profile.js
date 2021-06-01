@@ -1,10 +1,9 @@
 import { Button, IconButton, makeStyles } from '@material-ui/core'
 import React, { useContext, useState } from 'react'
-import { authContext } from '../../context/Auth'
 import Loader from '../Loader/Loader'
 import Update from '../updateProfile/Update'
 import EditIcon from '@material-ui/icons/Edit'
-import axios from 'axios'
+import { authContext } from '../../context/Auth'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -12,34 +11,30 @@ const useStyles = makeStyles((theme) => ({
     padding: 5,
 
     '& .wallScreenContainer': {
-      margin: 'auto',
       border: '1px solid',
       width: 800,
       height: 200,
-      display: 'flex',
-      alignItems: 'flex-end',
-      borderTopLeftRadius: 4,
-      borderTopRightRadius: 4,
+      margin: 'auto',
       background: 'grey',
       position: 'relative',
 
       '& .profileContainer': {
-        padding: 20,
-        display: 'flex',
-        width: '100%',
-        justifyContent: 'flex-end',
-        position: 'relative',
+        padding: '30px 20px',
+        border: '1px solid',
+        width: 250,
+        margin: 'auto',
+        marginTop: 77,
+        background: 'white',
 
         '& .profileSubContainer': {
-          position: 'absolute',
-          // border: '1px solid',
-          left: 30,
-          top: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
 
           '& .profilePicture': {
             height: 100,
             width: 100,
-            border: '4px solid white',
+            border: '1px solid',
             borderRadius: 100,
             backgroundColor: 'white',
             backgroundSize: 'cover',
@@ -48,11 +43,10 @@ const useStyles = makeStyles((theme) => ({
               cursor: 'pointer',
             },
           },
-        },
 
-        '& .editButton': {
-          color: 'white',
-          borderColor: 'white',
+          '& .nameContainerInProfile': {
+            marginTop: 30,
+          },
         },
       },
 
@@ -72,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
 
     '& .userBioContainer': {
       margin: 'auto',
-      marginTop: 125,
+      marginTop: 250,
       width: 800,
       minHeight: 100,
       background: '#e8e8e8',
@@ -81,9 +75,18 @@ const useStyles = makeStyles((theme) => ({
       padding: 24,
     },
   },
+
+  button: {
+    width: '100%',
+    marginTop: 50,
+
+    '& .MuiButton-root': {
+      width: '100%',
+    },
+  },
 }))
 
-export default function UserProfile() {
+export default function ProfileUser() {
   const classes = useStyles()
   const [openDialog, setOpenDialog] = useState(false)
   const { auth, setAuth } = useContext(authContext)
@@ -95,18 +98,6 @@ export default function UserProfile() {
   const avatarClickHandler = () => {
     const input = document.getElementById('avatar')
     input.click()
-  }
-
-  const avatarChangeHandler = (e) => {
-    const profileImg = e.target.files[0]
-
-    const formData = new FormData()
-    formData.append('profileImg', profileImg)
-
-    axios
-      .post('/user/profile', formData, {})
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err))
   }
 
   const wallImageClickHandler = () => {
@@ -138,23 +129,18 @@ export default function UserProfile() {
                 name='avatar'
                 id='avatar'
                 accept='image/*'
-                onChange={avatarChangeHandler}
                 hidden
               />
             </div>
-            <div>
+            <div className='nameContainerInProfile'>
               <div style={{ fontSize: 24, fontWeight: 500 }}>
                 {user.firstname} {user.lastname}
               </div>
-              <div>{user.username}</div>
+              <div style={{ textAlign: 'center' }}>{user.username}</div>
             </div>
           </div>
-          <div>
-            <Button
-              variant='outlined'
-              onClick={() => setOpenDialog(true)}
-              className='editButton'
-            >
+          <div className={classes.button}>
+            <Button variant='outlined' onClick={() => setOpenDialog(true)}>
               edit
             </Button>
           </div>
@@ -175,7 +161,7 @@ export default function UserProfile() {
         </div>
       </div>
 
-      <div className='userBioContainer'>Add Bio</div>
+      <div className='userBioContainer'>ADD Bio</div>
 
       <Update open={openDialog} onClose={onClose} user={user} />
     </div>
