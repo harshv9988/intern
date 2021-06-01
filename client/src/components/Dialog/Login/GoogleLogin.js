@@ -1,34 +1,40 @@
-import React from 'react'
-import GoogleLogin from 'react-google-login'
+import React, { useContext } from "react";
+import GoogleLogin from "react-google-login";
+import { authContext } from "../../../context/Auth";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
 
-function LoginWithGoogle() {
-  const handleSignIn = async (data) => {
-    // let res = await axios.post('url', {
-    //   token: data.tokenId,
-    // })
-    // setCookie('tempo', res.data.jwtToken, { path: '/' })
-    // console.log('RESPONSE', res)
-    // if (res.data.success) {
-    //   await setAuthData({
-    //     name: res.data.data.name,
-    //     authenticated: true,
-    //   })
-    // history.push('/feed')
-    // }
-    console.log(data)
-  }
+function LoginWithGoogle({ onClose }) {
+  let { auth, setAuth } = useContext(authContext);
+  let history = useHistory();
+  const handleSignIn = async (info) => {
+    console.log(info);
+    let { data } = await axios.post("/user/googlesignup", {
+      token: info.tokenId,
+    });
+    console.log("RESPONSE", data);
+    if (data.success) {
+      console.log(data.data);
+      await setAuth({
+        user: data.data,
+        authenticated: true,
+      });
+      onClose();
+      history.push("/profile");
+    }
+  };
 
   return (
     <div>
       <GoogleLogin
-        clientId=''
-        buttonText='Sign in with Google'
+        clientId="609110533672-iepitekbbjm6rc13l6nkhetjerm4v4g7.apps.googleusercontent.com"
+        buttonText="Sign in with Google"
         onSuccess={handleSignIn}
         onFailure={handleSignIn}
-        cookiePolicy={'single_host_origin'}
+        cookiePolicy={"single_host_origin"}
       />
     </div>
-  )
+  );
 }
 
-export default LoginWithGoogle
+export default LoginWithGoogle;

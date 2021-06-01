@@ -7,8 +7,8 @@ const userController = require("../controller/userController");
 const { isAuthenticatedUser } = require("../utils/authMiddleware");
 
 //multer
-// const AVATAR_PATH = path.join("../uploads");
-const AVATAR_PATH = path.join(__dirname, "../", "uploads");
+const AVATAR_PATH = path.join("./uploads");
+// const AVATAR_PATH = path.join(__dirname, "../", "uploads");
 
 const multer = require("multer");
 
@@ -41,6 +41,7 @@ router.post("/signup", userController.signupEmail);
 router.post("/verify", userController.verify);
 router.post("/login", userController.login);
 router.get("/me", isAuthenticatedUser, userController.getDetails);
+router.post("/googlesignup", userController.googleSignup);
 router.get("/signout", isAuthenticatedUser, userController.logout);
 
 module.exports = router;
