@@ -8,7 +8,7 @@ const sendEmail = async (options) => {
     secure: false,
     auth: {
       user: "harshv521",
-      pass: "9868559436",
+      pass: process.env.GMAILPASS,
     },
   });
 
