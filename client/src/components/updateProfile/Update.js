@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import TextField from '@material-ui/core/TextField'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -7,6 +7,7 @@ import { Button, Dialog } from '@material-ui/core'
 import { CircularProgress } from '@material-ui/core'
 import axios from 'axios'
 import Loader from '../Loader/Loader'
+import { authContext } from '../../context/Auth'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -132,11 +133,12 @@ export default function Update({ open, onClose, user }) {
     lastName: user.lastname,
     email: user.email,
     username: user.username,
-    bio: '',
+    bio: user.description,
   })
   const [loader, setLoader] = useState(false)
   const [fNameET, setFNameET] = useState('')
   const [lNameET, setLNameET] = useState('')
+  const { setAuth } = useContext(authContext)
 
   const changeHandler = (e) => {
     const { name, value } = e.target
@@ -157,7 +159,36 @@ export default function Update({ open, onClose, user }) {
   const submitHandler = (e) => {
     e.preventDefault()
 
+    if (!state.firstName) setFNameET('Field cannot be empty')
+    if (!state.lastName) setLNameET('Field cannot be empty')
+
+    if (!state.firstName || !state.lastName) return
     setLoader(true)
+
+    const data = {
+      firstname: state.firstName,
+      lastname: state.lastName,
+      description: state.bio,
+    }
+
+    axios({
+      method: 'post',
+      url: '/user/update',
+      data: data,
+    })
+      .then(function (res) {
+        setAuth({
+          authenticated: true,
+          user: res.data.data,
+        })
+        onClose()
+        setLoader(false)
+        // console.log(res)
+      })
+      .catch(function (error) {
+        console.log(error.data)
+        setLoader(false)
+      })
   }
 
   if (!user) {

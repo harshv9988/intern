@@ -20,8 +20,8 @@ const useStyles = makeStyles((theme) => ({
       alignItems: 'flex-end',
       borderTopLeftRadius: 4,
       borderTopRightRadius: 4,
-      background: 'grey',
       position: 'relative',
+      backgroundSize: 'cover',
 
       '& .profileContainer': {
         padding: 20,
@@ -87,8 +87,10 @@ export default function UserProfile() {
   const classes = useStyles()
   const [openDialog, setOpenDialog] = useState(false)
   const { auth, setAuth } = useContext(authContext)
-  const [user, setUser] = useState(null)
-  const [loader, setLoader] = useState(true)
+  const { user } = auth
+  // const [loader, setLoader] = useState(true)
+  const [profileImgUrl, setProfileImgUrl] = useState('')
+  const [coverImgUrl, setCoverImgUrl] = useState('')
 
   const onClose = () => setOpenDialog(false)
 
@@ -110,6 +112,7 @@ export default function UserProfile() {
           authenticated: true,
           user: res.data.data,
         })
+        setProfileImgUrl(res.data.data.avatar.url)
       })
       .catch((err) => console.log(err))
   }
@@ -119,23 +122,42 @@ export default function UserProfile() {
     input.click()
   }
 
-  useState(() => {
-    if (auth.authenticated) {
-      setLoader(false)
-      setUser(auth.user)
-    } else setUser(null)
-  }, [auth, setAuth])
+  const wallImageChangeHandler = (e) => {
+    const coverImg = e.target.files[0]
 
-  if (loader) return <Loader />
+    const formData = new FormData()
+    formData.append('coverImg', coverImg)
+
+    axios
+      .post('/user/cover', formData, {})
+      .then((res) => {
+        setAuth({
+          authenticated: true,
+          user: res.data.data,
+        })
+        setCoverImgUrl(res.data.data.cover.url)
+      })
+      .catch((err) => console.log(err))
+  }
+
+  // if (loader) return <Loader />
 
   return (
     <div className={classes.root}>
-      <div className='wallScreenContainer'>
+      <div
+        className='wallScreenContainer'
+        style={{
+          backgroundImage: `url(${coverImgUrl || user.cover.url})`,
+        }}
+      >
+        {console.log(user.cover.url)}
         <div className='profileContainer'>
           <div className='profileSubContainer'>
             <div
               className='profilePicture'
-              style={{ backgroundImage: `url(${user.avatar.url})` }}
+              style={{
+                backgroundImage: `url(${profileImgUrl || user.avatar.url})`,
+              }}
               onClick={avatarClickHandler}
             >
               <input
@@ -148,7 +170,13 @@ export default function UserProfile() {
               />
             </div>
             <div>
-              <div style={{ fontSize: 24, fontWeight: 500 }}>
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 500,
+                  textTransform: 'capitalize',
+                }}
+              >
                 {user.firstname} {user.lastname}
               </div>
               <div>{user.username}</div>
@@ -175,12 +203,15 @@ export default function UserProfile() {
             name='wallImage'
             id='wallImage'
             accept='image/*'
+            onChange={wallImageChangeHandler}
             hidden
           />
         </div>
       </div>
 
-      <div className='userBioContainer'>Add Bio</div>
+      <div className='userBioContainer'>
+        {user.description ? user.description : 'Add Bio'}
+      </div>
 
       <Update open={openDialog} onClose={onClose} user={user} />
     </div>
