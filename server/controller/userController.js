@@ -4,6 +4,51 @@ const sendEmail = require("../utils/sendEmail");
 const { OAuth2Client } = require("google-auth-library");
 const CLIENT_ID = "";
 const client = new OAuth2Client(CLIENT_ID);
+const { v4: uuidv4 } = require("uuid");
+
+module.exports.profileUpload = async (req, res) => {
+  try {
+    const url = req.protocol + "://" + req.get("host");
+    const profileImg = url + "/uploads/" + req.file.filename;
+    console.log(req.file.filename);
+
+    const user = await User.findById(req.user._id);
+
+    user.avatar.url = profileImg;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports.coverUpload = async (req, res) => {
+  try {
+    const url = req.protocol + "://" + req.get("host");
+    const profileImg = url + "/uploads/" + req.file.filename;
+    console.log(req.file.filename);
+
+    const user = await User.findById(req.user._id);
+
+    user.cover.url = profileImg;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: "Internal server error",
+    });
+  }
+};
 
 module.exports.googleSignup = async (req, res) => {
   try {
@@ -19,7 +64,8 @@ module.exports.googleSignup = async (req, res) => {
     if (user) {
       await sendTokenUser(user, 200, res);
     } else {
-      const username = given_name + family_name;
+      const uid = uuidv4();
+      const username = given_name + "_" + family_name + uid;
       user = await User.create({
         email,
         firstname: given_name,

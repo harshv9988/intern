@@ -13,6 +13,10 @@ app.use(bodyparser.urlencoded({ extended: true }));
 // app.use(fileupload());
 app.use(cookieParser());
 
+app.use("/uploads", express.static(__dirname + "uploads"));
+console.log(path.join(__dirname + "/uploads"));
+// app.use("/uploads", express.static("uploads"));
+
 //cors
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
